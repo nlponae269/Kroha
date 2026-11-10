@@ -3,11 +3,11 @@
 # /etc/issue, заставка Plymouth.
 set -e
 . /usr/share/kroha/os-release
-dpkg-divert --quiet --local --rename --add /usr/lib/os-release
+dpkg-divert --quiet --local --no-rename --add /usr/lib/os-release
 cp /usr/share/kroha/os-release /usr/lib/os-release
 ln -sf ../usr/lib/os-release /etc/os-release
 for f in /etc/issue /etc/issue.net; do
-	dpkg-divert --quiet --local --rename --add "$f"
+	dpkg-divert --quiet --local --no-rename --add "$f"
 done
 printf '%s \\n \\l\n\n' "$PRETTY_NAME" > /etc/issue
 printf '%s\n' "$PRETTY_NAME" > /etc/issue.net

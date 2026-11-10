@@ -40,6 +40,8 @@ echo "==> Графика (обои, логотип, GRUB, Plymouth, Calamares)"
 echo "==> live-build"
 cd "$WORK"
 lb config
+# Кэш иконок нужен: без него лаунчер с Papirus открывается заметно медленнее
+rm -f config/hooks/normal/9000-remove-gnome-icon-cache.hook.chroot
 lb build
 
 iso_src="$(find "$WORK" -maxdepth 1 -name '*.iso' | head -n1)"
