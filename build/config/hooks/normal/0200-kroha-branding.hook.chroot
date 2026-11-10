@@ -13,4 +13,6 @@ printf '%s \\n \\l\n\n' "$PRETTY_NAME" > /etc/issue
 printf '%s\n' "$PRETTY_NAME" > /etc/issue.net
 
 plymouth-set-default-theme kroha
+# Свои значки раскладки EN/RU для gxkb (обновления пакета их не затрут)
+for f in us ru; do dpkg-divert --quiet --local --no-rename --add "/usr/share/gxkb/flags/$f.png"; done
 # lsb_release и fastfetch берут имя из os-release; neofetch не ставим

@@ -8,7 +8,7 @@ case "$1" in
 esac
 exec rofi -show "$show" -modi "drun,window,run" \
 	-theme /usr/share/rofi/themes/kroha.rasi \
-	-show-icons -icon-theme Kroha -drun-match-fields name,generic,keywords,categories \
+	-show-icons -icon-theme Papirus-Dark -drun-match-fields name,generic,keywords,categories \
 	-display-drun "Программы" -display-window "Открытые окна" -display-run "Выполнить" \
 	-drun-display-format "{name}" -window-format "{t}" \
 	-kb-mode-next "Tab" -kb-mode-previous "ISO_Left_Tab" -kb-row-tab "" \

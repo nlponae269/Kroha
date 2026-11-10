@@ -1,4 +1,5 @@
-/* Лаунчер Kroha OS: полноэкранная сетка поверх размытого рабочего стола */
+/* Лаунчер Kroha OS: полноэкранная сетка поверх размытого рабочего стола.
+   Важно: одно свойство — одна строка (у rofi строки в кавычках «жадные»). */
 * {
     bg:        rgba(@BG_RGB@, 0.50);
     fg:        @TEXT@;
@@ -14,12 +15,15 @@
 window {
     fullscreen: true;
     background-color: @bg;
-    padding: 70px 150px 40px;
+    padding: 64px 12% 24px;
 }
-mainbox { children: [ inputbar, mode-switcher, listview ]; spacing: 0; }
+mainbox {
+    children: [ inputbar, mode-switcher, listview ];
+    spacing: 0;
+}
 inputbar {
     children: [ textbox-icon, entry ];
-    margin: 0 260px;
+    margin: 0 22%;
     padding: 11px 18px;
     spacing: 12px;
     border: 1px;
@@ -27,22 +31,48 @@ inputbar {
     border-color: @chipline;
     background-color: @chip;
 }
-textbox-icon { expand: false; str: "⌕"; font: "@FONT_UI@ 13"; text-color: @dim; }
-entry { placeholder: "Поиск программ…"; placeholder-color: @dim; cursor-color: @accent; font: "@FONT_UI@ 11"; }
-mode-switcher { margin: 16px 360px 22px; spacing: 8px; }
-button { padding: 6px 16px; border-radius: 999px; text-color: @dim; horizontal-align: 0.5; font: "@FONT_UI@ SemiBold 9"; }
-button selected { background-color: @accent; text-color: @BG@; }
+textbox-icon {
+    expand: false;
+    str: "⌕";
+    font: "@FONT_UI@ 16";
+    text-color: @dim;
+    vertical-align: 0.5;
+}
+entry {
+    placeholder: "Поиск программ…";
+    placeholder-color: @dim;
+    cursor-color: @accent;
+    font: "@FONT_UI@ 11";
+    vertical-align: 0.5;
+}
+mode-switcher {
+    margin: 16px 26% 20px;
+    spacing: 8px;
+}
+button {
+    padding: 6px 4px;
+    border-radius: 999px;
+    text-color: @dim;
+    horizontal-align: 0.5;
+    font: "@FONT_UI@ SemiBold 9";
+}
+button selected {
+    background-color: @accent;
+    text-color: @BG@;
+}
 listview {
     columns: 7;
     lines: 4;
+    flow: horizontal;
     spacing: 6px 10px;
     cycle: false;
-    dynamic: true;
-    layout: vertical;
+    dynamic: false;
     fixed-columns: true;
+    fixed-height: true;
     scrollbar: false;
 }
 element {
+    children: [ element-icon, element-text ];
     orientation: vertical;
     padding: 12px 4px 10px;
     spacing: 8px;
@@ -53,7 +83,18 @@ element selected.normal, element selected.active {
     border: 2px;
     border-color: @accent;
 }
-element-icon { size: 56px; horizontal-align: 0.5; cursor: inherit; }
-element-text { horizontal-align: 0.5; vertical-align: 0.5; cursor: inherit; }
-message { margin: 0 260px 10px; }
-textbox { horizontal-align: 0.5; text-color: @dim; }
+element-icon {
+    size: 52px;
+    horizontal-align: 0.5;
+}
+element-text {
+    horizontal-align: 0.5;
+    vertical-align: 0.5;
+}
+message {
+    margin: 0 22% 10px;
+}
+textbox {
+    horizontal-align: 0.5;
+    text-color: @dim;
+}

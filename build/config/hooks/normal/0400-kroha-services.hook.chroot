@@ -18,7 +18,7 @@ mask systemd-rfkill.service systemd-rfkill.socket
 
 # Bluetooth: служба не стартует при загрузке, но запускается сама,
 # когда открываешь «Bluetooth» (D-Bus-активация через алиас)
-dis bluetooth.service
+dis bluetooth.service blueman-mechanism.service
 ln -sf /usr/lib/systemd/system/bluetooth.service /etc/systemd/system/dbus-org.bluez.service
 
 # Ничего лишнего: проверка, что тяжёлые/ненужные пакеты не просочились
@@ -28,3 +28,7 @@ for p in cups cups-daemon avahi-daemon modemmanager snapd flatpak pulseaudio gno
 		apt-get purge -y "$p" || true
 	fi
 done
+
+# ldconfig и прочие «первая загрузка после обновления /usr» уже сделаны при сборке
+ldconfig
+touch /etc/.updated /var/.updated

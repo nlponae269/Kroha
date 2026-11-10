@@ -56,6 +56,19 @@ bar 240 4 "$SURFACE_HI" "" "$P/bar-bg.png"
 bar 240 4 "$ACCENT" "" "$P/bar.png"
 bar 360 40 "$SURFACE" "stroke='$BORDER' stroke-width='2'" "$P/entry.png"
 
+# Индикатор раскладки (gxkb): «EN» / «RU» вместо флагов
+K="$CH/usr/share/gxkb/flags"; mkdir -p "$K"
+for pair in us:EN ru:RU; do
+	code="${pair%%:*}"; label="${pair##*:}"
+	cat > "$TMP/kbd.svg" <<SVG
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+  <rect x="1" y="9" width="46" height="30" rx="8" fill="$TEXT" fill-opacity="0.16"/>
+  <text x="24" y="31" text-anchor="middle" font-family="$FONT_UI" font-weight="700" font-size="19" fill="$TEXT">$label</text>
+</svg>
+SVG
+	png -w 48 -h 48 "$TMP/kbd.svg" -o "$K/$code.png"
+done
+
 # GRUB: общие картинки для установленной системы и ISO
 grub_assets() {
 	local dir="$1"; mkdir -p "$dir"
