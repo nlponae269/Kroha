@@ -6,7 +6,11 @@ case "$1" in
 	run) show=run ;;
 	*) show=drun ;;
 esac
-exec rofi -show "$show" -modi "drun,window,run" \
+# Без композитора (эффекты выключены) — полупрозрачность «снимком экрана»,
+# чтобы под лаунчером были видны обои, а не чёрный фон
+fake=""
+pgrep -u "$(id -u)" -x picom >/dev/null || fake='window { transparency: "screenshot"; }'
+exec rofi -show "$show" -theme-str "$fake" -modi "drun,window,run" \
 	-theme /usr/share/rofi/themes/kroha.rasi \
 	-show-icons -icon-theme Papirus-Dark -drun-match-fields name,generic,keywords,categories \
 	-display-drun "Программы" -display-window "Открытые окна" -display-run "Выполнить" \

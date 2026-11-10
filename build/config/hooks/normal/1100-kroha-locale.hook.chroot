@@ -1,5 +1,6 @@
 #!/bin/sh
 # Русская локаль по умолчанию, раскладки us,ru (Alt+Shift), Москва.
+# Номер 1100 — после стандартного 1020-create-locales-files, который пишет LANG=C.UTF-8.
 set -e
 sed -i -e 's/^# *\(ru_RU.UTF-8 UTF-8\)/\1/' -e 's/^# *\(en_US.UTF-8 UTF-8\)/\1/' /etc/locale.gen
 locale-gen
