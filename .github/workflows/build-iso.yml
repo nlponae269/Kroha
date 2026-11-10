@@ -32,7 +32,7 @@ jobs:
           tmp=$(mktemp -d); cp -a build/. "$tmp/"; kroha_render_tree "$tmp/config"
           find "$tmp" -name '*.xml' -exec xmllint --noout {} +
           python3 -m json.tool build/config/includes.chroot/usr/lib/firefox-esr/distribution/policies.json >/dev/null
-          for s in design/*.svg.tmpl; do kroha_render "$s" "$tmp/x.svg" && rsvg-convert "$tmp/x.svg" -o /dev/null; done
+          for s in design/*.svg.tmpl; do kroha_render "$s" "$tmp/x.svg" && rsvg-convert "$tmp/x.svg" -o "$tmp/x.png"; done
           echo "Всё чисто"
 
   build:
