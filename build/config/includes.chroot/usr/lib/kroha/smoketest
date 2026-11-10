@@ -21,6 +21,11 @@ systemd-analyze 2>/dev/null | while read -r l; do say "analyze: $l"; done
 systemd-analyze blame 2>/dev/null | head -n 15 | while read -r l; do say "blame: $l"; done
 systemctl --failed --no-legend 2>/dev/null | while read -r l; do say "failed: $l"; done
 ps -eo rss,comm --sort=-rss | head -n 15 | while read -r l; do say "rss: $l"; done
+# PSS — честная доля памяти процесса (общие библиотеки поделены между всеми)
+for p in /proc/[0-9]*; do
+	kb=$(awk '/^Pss:/{print $2}' "$p/smaps_rollup" 2>/dev/null)
+	[ -n "$kb" ] && [ "$kb" -gt 3000 ] && echo "$kb $(cat "$p/comm" 2>/dev/null)"
+done | sort -rn | head -n 20 | while read -r kb name; do say "pss: $((kb / 1024)) MB $name"; done
 if [ "$(systemctl is-active graphical.target)" = active ] && pgrep -x tint2 >/dev/null; then
 	say "RESULT=PASS"
 else
