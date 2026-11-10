@@ -1,0 +1,6 @@
+---
+type:       "job"
+name:       "kroha-bootloader-config"
+interface:  "process"
+command:    "/usr/lib/kroha/calamares-bootloader-config"
+timeout:    600

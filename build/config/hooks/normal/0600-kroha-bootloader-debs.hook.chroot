@@ -1,0 +1,11 @@
+#!/bin/sh
+# Пакеты загрузчика для установщика: кладём .deb в образ, чтобы установка
+# работала без интернета (grub-pc и grub-efi-amd64 конфликтуют, поэтому
+# заранее их не ставим — нужный выбирает calamares-bootloader-config).
+set -e
+D=/usr/share/kroha/bootloader-debs
+mkdir -p "$D"
+cd "$D"
+apt-get download grub-efi grub-efi-amd64 grub-pc
+chmod 644 ./*.deb
+ls -la

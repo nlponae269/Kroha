@@ -61,4 +61,5 @@ grub2-common
 shim-signed
 efibootmgr
 os-prober
+ucf
 fonts-dejavu-core

@@ -1,0 +1,32 @@
+#!/bin/sh
+# Замена calamares-bootloader-config из Debian: ставит grub-efi (UEFI) или
+# grub-pc (BIOS) из .deb, лежащих в образе, — интернет не нужен.
+CHROOT=$(mount | grep proc | grep calamares | awk '{print $3}' | sed -e "s#/proc##g")
+[ -n "$CHROOT" ] || { echo "не найден корень установки"; exit 1; }
+DEBS=/usr/share/kroha/bootloader-debs
+
+# Зашифрованный диск — как в Debian
+if [ "$(mount | grep "$CHROOT " | cut -c -16)" = "/dev/mapper/luks" ]; then
+	echo "UMASK=0077" > "$CHROOT/etc/initramfs-tools/conf.d/initramfs-permissions"
+	chroot "$CHROOT" apt-get -y install cryptsetup-initramfs cryptsetup keyutils
+fi
+
+if [ -d /sys/firmware/efi/efivars ]; then
+	echo " * UEFI: ставлю grub-efi"
+	pkgs="grub-efi-amd64_ grub-efi_"
+else
+	echo " * BIOS: ставлю grub-pc"
+	pkgs="grub-pc_"
+fi
+mkdir -p "$CHROOT/tmp/kroha-debs"
+for p in $pkgs; do cp "$DEBS/$p"*.deb "$CHROOT/tmp/kroha-debs/"; done
+if ! DEBIAN_FRONTEND=noninteractive chroot "$CHROOT" sh -c 'dpkg -i /tmp/kroha-debs/*.deb'; then
+	echo " * dpkg не справился — пробую apt (нужен интернет)"
+	DEBIAN_FRONTEND=noninteractive chroot "$CHROOT" apt-get -y -f install
+fi
+rm -rf "$CHROOT/tmp/kroha-debs"
+rm -rf "$CHROOT/usr/share/kroha/bootloader-debs"
+
+sed -i "s/^#GRUB_DISABLE_OS_PROBER=false/GRUB_DISABLE_OS_PROBER=false/" "$CHROOT/etc/default/grub"
+chroot "$CHROOT" /usr/sbin/update-grub
+exit 0
