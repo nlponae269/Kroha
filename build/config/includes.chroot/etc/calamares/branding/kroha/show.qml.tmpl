@@ -1,0 +1,72 @@
+/* Слайды во время установки @OS_NAME@ */
+import QtQuick 2.0;
+import calamares.slideshow 1.0;
+
+Presentation
+{
+    id: presentation
+
+    function onActivate() { }
+    function onLeave() { }
+
+    Timer {
+        interval: 12000
+        running: presentation.activatedInCalamares
+        repeat: true
+        onTriggered: presentation.goToNextSlide()
+    }
+
+    component KSlide: Slide {
+        id: s
+        property string emoji: ""
+        property string title: ""
+        property string body: ""
+        property color tint: "@ACCENT@"
+        Rectangle {
+            anchors.fill: parent
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: "@BG@" }
+                GradientStop { position: 1.0; color: "@PANEL@" }
+            }
+            Rectangle {
+                width: parent.width * 0.55; height: width; radius: width / 2
+                x: parent.width * 0.62; y: -height * 0.35
+                color: s.tint; opacity: 0.18
+            }
+            Column {
+                anchors.left: parent.left; anchors.leftMargin: 48
+                anchors.verticalCenter: parent.verticalCenter
+                width: parent.width - 96
+                spacing: 14
+                Text { text: s.emoji; font.pixelSize: 44 }
+                Text { text: s.title; color: "@TEXT@"; font.family: "@FONT_UI@"; font.pixelSize: 26; font.bold: true; wrapMode: Text.WordWrap; width: parent.width }
+                Rectangle { width: 56; height: 4; radius: 2; color: s.tint }
+                Text { text: s.body; color: "@TEXT_DIM@"; font.family: "@FONT_UI@"; font.pixelSize: 15; lineHeight: 1.3; wrapMode: Text.WordWrap; width: parent.width }
+            }
+        }
+    }
+
+    KSlide {
+        emoji: "🧡"
+        title: "Добро пожаловать в @OS_NAME@"
+        body: "Лёгкая и быстрая система для твоего ноутбука. Пока идёт установка, можно спокойно попить чаю — это займёт 5–15 минут."
+    }
+    KSlide {
+        emoji: "🚀"
+        tint: "@ACCENT2@"
+        title: "Всё под рукой"
+        body: "Нажми клавишу Win — откроются все программы с поиском. Снизу — док с любимыми программами, сверху — часы, сеть, звук и батарея."
+    }
+    KSlide {
+        emoji: "🌐"
+        tint: "@ACCENT3@"
+        title: "Интернет, музыка, фильмы, документы"
+        body: "Firefox с блокировщиком рекламы, видеоплеер mpv, просмотр фото и PDF, архиватор и калькулятор уже установлены. Новые программы — в «Программы» (Synaptic)."
+    }
+    KSlide {
+        emoji: "⌨️"
+        tint: "@ACCENT4@"
+        title: "Полезные клавиши"
+        body: "Alt+Shift — сменить язык.  Win+E — файлы.  Win+T — терминал.  Win+L — заблокировать.  Print — снимок экрана.  Win+← / → — окно на половину экрана."
+    }
+}

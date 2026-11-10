@@ -1,0 +1,16 @@
+#!/bin/sh
+# Лаунчер Kroha OS (rofi): kroha-launcher [apps|windows|run]
+if pgrep -x rofi >/dev/null; then pkill -x rofi; exit 0; fi
+case "$1" in
+	windows) show=window ;;
+	run) show=run ;;
+	*) show=drun ;;
+esac
+exec rofi -show "$show" -modi "drun,window,run" \
+	-theme /usr/share/rofi/themes/kroha.rasi \
+	-show-icons -icon-theme Kroha -drun-match-fields name,generic,keywords,categories \
+	-display-drun "Программы" -display-window "Открытые окна" -display-run "Выполнить" \
+	-drun-display-format "{name}" -window-format "{t}" \
+	-kb-mode-next "Tab" -kb-mode-previous "ISO_Left_Tab" -kb-row-tab "" \
+	-kb-element-next "" -kb-element-prev "" \
+	-me-select-entry "" -me-accept-entry "MousePrimary"

@@ -1,0 +1,5 @@
+#!/bin/sh
+# Запуск установщика Calamares (обёртка над calamares-install-debian из Debian)
+pgrep -x calamares >/dev/null && exit 0
+export QT_QPA_PLATFORMTHEME=gtk3
+exec /usr/bin/calamares-install-debian "$@"

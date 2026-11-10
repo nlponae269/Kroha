@@ -1,0 +1,46 @@
+# X11 и графика
+xserver-xorg-core
+xserver-xorg-video-amdgpu
+xserver-xorg-video-ati
+xserver-xorg-video-fbdev
+xserver-xorg-video-vesa
+xserver-xorg-input-libinput
+x11-xserver-utils
+x11-xkb-utils
+x11-utils
+xauth
+libgl1-mesa-dri
+libglx-mesa0
+mesa-va-drivers
+# Вход в систему
+lightdm
+lightdm-gtk-greeter
+light-locker
+xss-lock
+# Окружение Kroha: Openbox + две панели tint2 + picom (размытие)
+openbox
+tint2
+picom
+jgmenu
+rofi
+dunst
+libnotify-bin
+pcmanfm
+lxappearance
+arandr
+gxkb
+playerctl
+# Темы и шрифты
+arc-theme
+gtk2-engines-murrine
+gtk2-engines-pixbuf
+papirus-icon-theme
+adwaita-icon-theme
+libglib2.0-bin
+qt5-gtk-platformtheme
+qt6-gtk-platformtheme
+fonts-inter
+fonts-jetbrains-mono
+fonts-noto-core
+fonts-noto-color-emoji
+xcape

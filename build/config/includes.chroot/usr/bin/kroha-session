@@ -1,0 +1,11 @@
+#!/bin/sh
+# Запуск сеанса Kroha OS (выбирается в LightDM).
+export XDG_CURRENT_DESKTOP=Kroha
+export XDG_SESSION_DESKTOP=kroha
+export DESKTOP_SESSION=kroha
+export QT_QPA_PLATFORMTHEME=gtk3
+export GTK_OVERLAY_SCROLLING=1
+export MOZ_X11_EGL=1
+# Пользовательские дополнения
+[ -r "$HOME/.config/kroha/environment" ] && . "$HOME/.config/kroha/environment"
+exec openbox-session

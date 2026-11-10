@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Эффекты вкл/выкл
+Comment=Размытие дока и скругления окон (выключи, если тормозит)
+Exec=kroha-effects toggle
+Icon=preferences-desktop-effects
+Categories=Settings;DesktopSettings;
+Keywords=blur;picom;эффекты;размытие;прозрачность;

@@ -1,0 +1,22 @@
+#!/bin/sh
+# Меньше размер образа: только русские и английские переводы, без документации
+# (файлы copyright оставляем). То же правило — для будущих установок пакетов.
+set -e
+cat > /etc/dpkg/dpkg.cfg.d/01-kroha-slim <<'DPKG'
+path-exclude=/usr/share/doc/*
+path-include=/usr/share/doc/*/copyright
+path-exclude=/usr/share/man/*
+path-exclude=/usr/share/info/*
+path-exclude=/usr/share/locale/*
+path-include=/usr/share/locale/ru/*
+path-include=/usr/share/locale/ru_RU/*
+path-include=/usr/share/locale/en*
+path-include=/usr/share/locale/locale.alias
+DPKG
+find /usr/share/doc -mindepth 1 ! -name copyright ! -type d -delete 2>/dev/null || true
+find /usr/share/doc -mindepth 1 -type d -empty -delete 2>/dev/null || true
+rm -rf /usr/share/man/* /usr/share/info/*
+find /usr/share/locale -mindepth 1 -maxdepth 1 -type d ! -name 'ru' ! -name 'ru_RU' ! -name 'en*' -exec rm -rf {} + 2>/dev/null || true
+# Firefox: оставить только русский и английский языковые пакеты
+apt-get clean
+rm -rf /var/lib/apt/lists/* /var/cache/apt/*.bin /tmp/* 2>/dev/null || true

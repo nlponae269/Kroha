@@ -1,0 +1,114 @@
+#!/bin/sh
+# Тема GTK «Kroha» (перекрашенная Arc-Dark) и тема иконок «Kroha» (Papirus-Dark
+# с папками в акцентном цвете). Палитра — из /usr/share/kroha/palette.env.
+set -e
+. /usr/share/kroha/palette.env
+
+SRC=/usr/share/themes/Arc-Dark
+DST=/usr/share/themes/Kroha
+mkdir -p "$DST/gtk-3.0" "$DST/gtk-2.0"
+
+# --- GTK 3: распаковка gresource Arc-Dark ---
+for r in $(gresource list "$SRC/gtk-3.0/gtk.gresource"); do
+	rel=${r#/org/gnome/arc-theme/}
+	mkdir -p "$DST/gtk-3.0/$(dirname "$rel")"
+	gresource extract "$SRC/gtk-3.0/gtk.gresource" "$r" > "$DST/gtk-3.0/$rel"
+done
+mv "$DST/gtk-3.0/gtk-main-dark.css" "$DST/gtk-3.0/gtk.css"
+rm -f "$DST/gtk-3.0/gtk-main.css"
+
+rgb() { printf '%d, %d, %d' "0x$(echo "$1" | cut -c2-3)" "0x$(echo "$1" | cut -c4-5)" "0x$(echo "$1" | cut -c6-7)"; }
+# Карта цветов Arc-Dark -> Kroha (hex и rgba)
+cat > /tmp/kroha-colors.sed <<MAP
+s/#383c4a/$PANEL/gI
+s/#404552/$SURFACE/gI
+s/#2f343f/$BG/gI
+s/#2b2e39/#17181D/gI
+s/#d3dae3/$TEXT/gI
+s/#bac3cf/#BDBBB8/gI
+s/#5294e2/$ACCENT_DARK/gI
+s/#2679db/$ACCENT_DARK/gI
+s/#a9caf1/$ACCENT_LIGHT/gI
+s/#7eafe9/$ACCENT_LIGHT/gI
+s/#b1cff2/$ACCENT_LIGHT/gI
+s/#dceaf9/#FFE3D0/gI
+s/#fc4138/$ERROR/gI
+s/#f04a50/$ERROR/gI
+s/#73d216/$SUCCESS/gI
+s/#4dadd4/$ACCENT2/gI
+s/#76c0de/$ACCENT2/gI
+s/#2e96c0/$ACCENT2/gI
+s/#444a58/$SURFACE_HI/gI
+s/#505666/#45485C/gI
+s/#5d626e/#55586B/gI
+s/rgba(56, 60, 74/rgba($(rgb "$PANEL")/g
+s/rgba(64, 69, 82/rgba($(rgb "$SURFACE")/g
+s/rgba(47, 52, 63/rgba($(rgb "$BG")/g
+s/rgba(43, 46, 57/rgba(23, 24, 29/g
+s/rgba(211, 218, 227/rgba($(rgb "$TEXT")/g
+s/rgba(207, 218, 231/rgba($(rgb "$TEXT")/g
+s/rgba(186, 195, 207/rgba(189, 187, 184/g
+s/rgba(82, 148, 226/rgba($(rgb "$ACCENT_DARK")/g
+MAP
+sed -i -f /tmp/kroha-colors.sed "$DST/gtk-3.0/gtk.css"
+cat /usr/share/kroha/gtk3-overrides.css >> "$DST/gtk-3.0/gtk.css"
+echo '@import url("gtk.css");' > "$DST/gtk-3.0/gtk-dark.css"
+
+# --- GTK 2: копия Arc-Dark с перекрашенной схемой ---
+cp -r "$SRC/gtk-2.0/." "$DST/gtk-2.0/"
+sed -i -f /tmp/kroha-colors.sed "$DST/gtk-2.0/gtkrc" "$DST"/gtk-2.0/*.rc 2>/dev/null || true
+rm -f /tmp/kroha-colors.sed
+
+cat > "$DST/index.theme" <<IDX
+[Desktop Entry]
+Type=X-GNOME-Metatheme
+Name=Kroha
+Comment=Тема Kroha OS (на основе Arc-Dark)
+Encoding=UTF-8
+
+[X-GNOME-Metatheme]
+GtkTheme=Kroha
+MetacityTheme=Kroha
+IconTheme=Kroha
+CursorTheme=Adwaita
+ButtonLayout=close,minimize,maximize:
+IDX
+
+# --- Иконки: Kroha = Papirus-Dark + папки в акцентном цвете ---
+PAP=/usr/share/icons/Papirus
+ICO=/usr/share/icons/Kroha
+rm -rf "$ICO"; mkdir -p "$ICO"
+dirs=""
+for sizedir in "$PAP"/*/places; do
+	size=$(basename "$(dirname "$sizedir")")
+	case "$size" in symbolic) continue ;; esac
+	mkdir -p "$ICO/$size/places"
+	# каждое «синее» имя (folder.svg -> folder-blue.svg) превращаем в перекрашенный файл
+	for link in "$sizedir"/*.svg; do
+		[ -L "$link" ] || continue
+		target=$(readlink "$link")
+		case "$target" in *blue*) ;; *) continue ;; esac
+		real=$(readlink -f "$link")
+		[ -f "$real" ] || continue
+		sed -e "s/#5294e2/$ACCENT/gI" -e "s/#4877b1/$ACCENT_DARK/gI" "$real" > "$ICO/$size/places/$(basename "$link")"
+	done
+	dirs="$dirs${dirs:+,}$size/places"
+done
+{
+	echo "[Icon Theme]"
+	echo "Name=Kroha"
+	echo "Comment=Papirus-Dark с папками Kroha OS"
+	echo "Inherits=Papirus-Dark,Papirus,breeze-dark,Adwaita,hicolor"
+	echo "Directories=$dirs"
+	sed -n '/^\[Icon Theme\]/,/^\[/{/^\(Example\|FollowsColorScheme\|DesktopDefault\|DesktopSizes\|ToolbarDefault\|ToolbarSizes\|MainToolbarDefault\|MainToolbarSizes\|SmallDefault\|SmallSizes\|PanelDefault\|PanelSizes\|DialogDefault\|DialogSizes\)=/p}' "$PAP/index.theme"
+	echo
+	for d in $(echo "$dirs" | tr ',' ' '); do
+		awk -v sec="[$d]" 'BEGIN{p=0} $0==sec{p=1; print; next} /^\[/{if(p) exit} p' "$PAP/index.theme"
+		echo
+	done
+} > "$ICO/index.theme"
+gtk-update-icon-cache -q -f "$ICO" || true
+gtk-update-icon-cache -q -f /usr/share/icons/hicolor || true
+
+# Курсор по умолчанию
+update-alternatives --set x-cursor-theme /usr/share/icons/Adwaita/cursor.theme 2>/dev/null || true

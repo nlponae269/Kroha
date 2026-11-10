@@ -1,0 +1,4 @@
+#!/bin/sh
+# Блокировка экрана (в live-режиме пароля нет — не блокируем)
+[ -d /run/live/medium ] && exit 0
+light-locker-command -l 2>/dev/null || dm-tool lock

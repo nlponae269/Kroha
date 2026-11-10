@@ -1,0 +1,78 @@
+# Уведомления Kroha OS — стеклянные карточки справа сверху (размытие — picom)
+[global]
+    monitor = 0
+    follow = mouse
+    width = 340
+    height = (0, 160)
+    origin = top-right
+    offset = (14, 42)
+    scale = 0
+    notification_limit = 4
+    progress_bar = true
+    progress_bar_height = 6
+    progress_bar_frame_width = 0
+    progress_bar_min_width = 150
+    progress_bar_max_width = 300
+    progress_bar_corner_radius = 3
+    indicate_hidden = yes
+    transparency = 0
+    separator_height = 0
+    padding = 14
+    horizontal_padding = 16
+    text_icon_padding = 12
+    frame_width = 1
+    frame_color = "#FFFFFF18"
+    gap_size = 8
+    separator_color = frame
+    sort = yes
+    font = @FONT_UI@ 10
+    line_height = 2
+    markup = full
+    format = "<b>%s</b>\n%b"
+    alignment = left
+    vertical_alignment = center
+    show_age_threshold = 60
+    ellipsize = middle
+    ignore_newline = no
+    stack_duplicates = true
+    hide_duplicate_count = false
+    show_indicators = no
+    enable_recursive_icon_lookup = true
+    icon_theme = Kroha, Papirus-Dark
+    icon_position = left
+    min_icon_size = 32
+    max_icon_size = 44
+    sticky_history = yes
+    history_length = 20
+    browser = /usr/bin/xdg-open
+    always_run_script = true
+    title = Dunst
+    class = Dunst
+    corner_radius = 14
+    ignore_dbusclose = false
+    mouse_left_click = do_action, close_current
+    mouse_middle_click = close_all
+    mouse_right_click = close_current
+    highlight = "@ACCENT@"
+
+[urgency_low]
+    background = "@BG@D0"
+    foreground = "@TEXT_DIM@"
+    timeout = 5
+
+[urgency_normal]
+    background = "@BG@D0"
+    foreground = "@TEXT@"
+    timeout = 7
+
+[urgency_critical]
+    background = "#2A1E22E8"
+    foreground = "@TEXT@"
+    frame_color = "@ERROR@"
+    highlight = "@ERROR@"
+    timeout = 0
+
+[kroha-volume]
+    appname = kroha-volume
+    history_ignore = yes
+    timeout = 2

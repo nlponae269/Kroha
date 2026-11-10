@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openbox_menu xmlns="http://openbox.org/3.4/menu">
+  <menu id="root-menu" label="Kroha OS">
+    <item label="Программы"><action name="Execute"><command>kroha-launcher</command></action></item>
+    <item label="Файлы"><action name="Execute"><command>pcmanfm</command></action></item>
+    <item label="Терминал"><action name="Execute"><command>lxterminal</command></action></item>
+    <separator/>
+    <item label="Оформление"><action name="Execute"><command>lxappearance</command></action></item>
+    <item label="Экраны"><action name="Execute"><command>arandr</command></action></item>
+    <item label="Эффекты вкл/выкл"><action name="Execute"><command>kroha-effects toggle</command></action></item>
+    <separator/>
+    <item label="Выключение…"><action name="Execute"><command>kroha-power</command></action></item>
+  </menu>
+</openbox_menu>

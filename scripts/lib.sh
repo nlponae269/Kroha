@@ -2,7 +2,8 @@
 # Общие функции сборки Kroha OS: загрузка палитры/названия и рендер шаблонов.
 # Шаблон — любой файл *.tmpl. В нём @ИМЯ@ заменяется значением переменной
 # из config/os-release.env или design/palette.env. Для каждого цвета
-# автоматически есть @ИМЯ_RGB@ ("255, 138, 61") и @ИМЯ_HEX@ (без решётки).
+# автоматически есть @ИМЯ_RGB@ ("255, 138, 61"), @ИМЯ_FLOAT@ ("1.000, 0.541, 0.239")
+# и @ИМЯ_HEX@ (без решётки).
 
 KROHA_ROOT="${KROHA_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 KROHA_ENV_FILES=("$KROHA_ROOT/config/os-release.env" "$KROHA_ROOT/design/palette.env")
@@ -26,7 +27,9 @@ kroha_load_vars() {
 		if [[ "$value" =~ ^#([0-9A-Fa-f]{2})([0-9A-Fa-f]{2})([0-9A-Fa-f]{2})$ ]]; then
 			r=$((16#${BASH_REMATCH[1]})); g=$((16#${BASH_REMATCH[2]})); b=$((16#${BASH_REMATCH[3]}))
 			printf 's|@%s_RGB@|%d, %d, %d|g\n' "$name" "$r" "$g" "$b" >> "$KROHA_SED_SCRIPT"
+			printf 's|@%s_RGB_SEMI@|%d;%d;%d|g\n' "$name" "$r" "$g" "$b" >> "$KROHA_SED_SCRIPT"
 			printf 's|@%s_HEX@|%s|g\n' "$name" "${value#\#}" >> "$KROHA_SED_SCRIPT"
+			printf 's|@%s_FLOAT@|%s|g\n' "$name" "$(awk -v r="$r" -v g="$g" -v b="$b" 'BEGIN{printf "%.3f, %.3f, %.3f", r/255, g/255, b/255}')" >> "$KROHA_SED_SCRIPT"
 		fi
 	done
 	export KROHA_SED_SCRIPT
@@ -37,9 +40,12 @@ kroha_render() {
 	[ -n "$KROHA_SED_SCRIPT" ] || kroha_load_vars
 	mkdir -p "$(dirname "$2")"
 	sed -f "$KROHA_SED_SCRIPT" "$1" > "$2"
-	if grep -qE '@[A-Z][A-Z0-9_]*@' "$2"; then
+	# Метки live-build (@KERNEL_LIVE@ и т.п.) оставляем — их заменит сам live-build
+	local left
+	left="$(grep -noE '@[A-Z][A-Z0-9_]*@' "$2" | grep -vE ':@(KERNEL|INITRD|APPEND|LB|ENABLE|MEMTEST|FLAVOUR)_' || true)"
+	if [ -n "$left" ]; then
 		echo "ОШИБКА: в $2 остались незаменённые переменные:" >&2
-		grep -noE '@[A-Z][A-Z0-9_]*@' "$2" >&2
+		echo "$left" >&2
 		return 1
 	fi
 }

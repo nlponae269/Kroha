@@ -1,0 +1,23 @@
+/* Небольшое меню по центру (выключение и т.п.) */
+* {
+    background-color: transparent;
+    text-color: @TEXT@;
+    font: "@FONT_UI@ 11";
+}
+window {
+    width: 420px;
+    border-radius: 18px;
+    border: 1px;
+    border-color: rgba(255, 255, 255, 0.10);
+    background-color: rgba(@BG_RGB@, 0.72);
+    padding: 18px;
+}
+mainbox { children: [ message, listview ]; spacing: 12px; }
+message { padding: 0 4px; }
+textbox { font: "@FONT_UI@ Bold 12"; text-color: @TEXT@; }
+inputbar { enabled: false; }
+listview { lines: 5; spacing: 4px; scrollbar: false; fixed-height: false; }
+element { padding: 10px 14px; border-radius: 10px; spacing: 12px; }
+element selected.normal { background-color: @ACCENT@; text-color: @BG@; }
+element-icon { size: 22px; }
+element-text { text-color: inherit; vertical-align: 0.5; }

@@ -1,0 +1,150 @@
+# Kroha OS — верхняя строка (логотип | часы по центру | трей, батарея, питание)
+#-------------------------------------
+# Фон 1: стекло строки
+rounded = 0
+border_width = 1
+border_sides = B
+border_content_tint_weight = 0
+background_content_tint_weight = 0
+background_color = @BG@ @GLASS_OPACITY@
+border_color = #FFFFFF 6
+background_color_hover = @BG@ @GLASS_OPACITY@
+border_color_hover = #FFFFFF 6
+background_color_pressed = @BG@ @GLASS_OPACITY@
+border_color_pressed = #FFFFFF 6
+
+# Фон 2: кнопка-«пилюля» (логотип)
+rounded = 12
+border_width = 0
+border_sides = TBLR
+background_color = #FFFFFF 0
+border_color = #FFFFFF 0
+background_color_hover = #FFFFFF 10
+border_color_hover = #FFFFFF 0
+background_color_pressed = #FFFFFF 16
+border_color_pressed = #FFFFFF 0
+
+# Фон 3: кнопка питания (акцентный круг)
+rounded = 12
+border_width = 0
+border_sides = TBLR
+background_color = @ACCENT@ 20
+border_color = #FFFFFF 0
+background_color_hover = @ACCENT@ 45
+border_color_hover = #FFFFFF 0
+background_color_pressed = @ACCENT@ 70
+border_color_pressed = #FFFFFF 0
+
+# Фон 4: всплывающие подсказки
+rounded = 8
+border_width = 1
+border_sides = TBLR
+background_color = @PANEL@ 95
+border_color = #FFFFFF 10
+background_color_hover = @PANEL@ 95
+border_color_hover = #FFFFFF 10
+background_color_pressed = @PANEL@ 95
+border_color_pressed = #FFFFFF 10
+
+#-------------------------------------
+# Панель
+panel_items = PFCFSBP
+panel_size = 100% 30
+panel_margin = 0 0
+panel_padding = 8 3 12
+panel_background_id = 1
+wm_menu = 1
+panel_dock = 0
+panel_position = top center horizontal
+panel_layer = top
+panel_monitor = all
+panel_shrink = 0
+autohide = 0
+strut_policy = follow_size
+panel_window_name = kroha-topbar
+disable_transparency = 0
+mouse_effects = 1
+font_shadow = 0
+mouse_hover_icon_asb = 100 0 10
+mouse_pressed_icon_asb = 100 0 0
+scale_relative_to_dpi = 0
+scale_relative_to_screen_height = 0
+
+#-------------------------------------
+# Кнопка 1: логотип → лаунчер (правый клик — классическое меню)
+button = new
+button_icon = /usr/share/icons/hicolor/scalable/apps/kroha-logo.svg
+button_text = @OS_NAME@
+button_tooltip = Программы (Win)
+button_font = @FONT_UI@ Bold 10
+button_font_color = @TEXT@ 100
+button_padding = 8 3 8
+button_background_id = 2
+button_centered = 0
+button_max_icon_size = 20
+button_lclick_command = kroha-launcher
+button_rclick_command = jgmenu_run
+button_mclick_command =
+button_uwheel_command =
+button_dwheel_command =
+
+#-------------------------------------
+# Часы (по центру)
+time1_format = %a, %e %b   %H:%M
+time2_format =
+time1_font = @FONT_UI@ Semi-Bold 10
+clock_font_color = @TEXT@ 100
+clock_padding = 6 0
+clock_background_id = 0
+clock_tooltip = %A, %e %B %Y
+clock_tooltip_timezone =
+clock_lclick_command =
+clock_rclick_command =
+
+#-------------------------------------
+# Трей: раскладка (gxkb), сеть, звук, питание
+systray_padding = 6 0 12
+systray_background_id = 0
+systray_sort = right2left
+systray_icon_size = 18
+systray_icon_asb = 100 0 0
+systray_monitor = 1
+systray_name_filter =
+
+#-------------------------------------
+# Батарея
+battery_tooltip = 1
+battery_low_status = 10
+battery_low_cmd = notify-send -u critical -i battery-caution "Батарея почти разряжена" "Подключи зарядку"
+battery_full_cmd =
+bat1_font = @FONT_UI@ 9
+bat2_font = @FONT_UI@ 9
+bat1_format = %p
+bat2_format =
+battery_font_color = @TEXT_DIM@ 100
+battery_padding = 6 0
+battery_background_id = 0
+battery_hide = 101
+battery_lclick_command = xfce4-power-manager-settings
+ac_connected_cmd =
+ac_disconnected_cmd =
+
+#-------------------------------------
+# Кнопка 2: питание
+button = new
+button_icon = system-shutdown-panel
+button_text =
+button_tooltip = Выключение, перезагрузка, сон
+button_padding = 5 5 0
+button_background_id = 3
+button_centered = 1
+button_max_icon_size = 14
+button_lclick_command = kroha-power
+
+#-------------------------------------
+tooltip_show_timeout = 0.4
+tooltip_hide_timeout = 0.1
+tooltip_padding = 8 5
+tooltip_background_id = 4
+tooltip_font_color = @TEXT@ 100
+tooltip_font = @FONT_UI@ 9

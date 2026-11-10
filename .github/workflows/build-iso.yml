@@ -1,0 +1,153 @@
+name: build-iso
+
+on:
+  push:
+    branches: ["**"]
+    tags: ["v*"]
+    paths-ignore: ["README.md", "docs/**", "CLAUDE.md"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: build-iso-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  lint:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Проверка скриптов и конфигов
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq shellcheck yamllint libxml2-utils librsvg2-bin
+          shellcheck scripts/*.sh
+          find build -type f \( -path '*/usr/bin/*' -o -path '*/usr/lib/kroha/*' -o -name '*.hook.chroot' \) \
+            -exec shellcheck -s sh {} +
+          yamllint -d '{extends: relaxed, rules: {line-length: disable}}' .github build/config/includes.chroot/etc/calamares
+          . scripts/lib.sh && kroha_load_vars
+          tmp=$(mktemp -d); cp -a build/. "$tmp/"; kroha_render_tree "$tmp/config"
+          find "$tmp" -name '*.xml' -exec xmllint --noout {} +
+          python3 -m json.tool build/config/includes.chroot/usr/lib/firefox-esr/distribution/policies.json >/dev/null
+          for s in design/*.svg.tmpl; do kroha_render "$s" "$tmp/x.svg" && rsvg-convert "$tmp/x.svg" -o /dev/null; done
+          echo "Всё чисто"
+
+  build:
+    needs: lint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    container:
+      image: debian:trixie
+      # live-build нужны mount/chroot; тома — чтобы освободить место на раннере
+      options: >-
+        --privileged
+        -v /usr/share/dotnet:/host/dotnet
+        -v /usr/local/lib/android:/host/android
+        -v /opt/hostedtoolcache:/host/toolcache
+    steps:
+      - name: Освободить место на раннере
+        run: |
+          rm -rf /host/dotnet/* /host/android/* /host/toolcache/* || true
+          df -h /
+      - uses: actions/checkout@v4
+      - name: Инструменты сборки
+        run: |
+          apt-get update -qq
+          DEBIAN_FRONTEND=noninteractive apt-get install -y -qq \
+            live-build librsvg2-bin xorriso squashfs-tools ca-certificates \
+            grub-common fonts-dejavu-core fonts-inter
+      - name: Кэш пакетов
+        uses: actions/cache@v4
+        with:
+          path: .cache/live-build
+          key: lb-${{ hashFiles('build/config/package-lists/*', 'build/auto/config') }}-${{ github.run_id }}
+          restore-keys: |
+            lb-${{ hashFiles('build/config/package-lists/*', 'build/auto/config') }}-
+            lb-
+      - name: Сборка ISO
+        run: bash scripts/build-iso.sh
+      - name: Лог сборки
+        if: always()
+        run: |
+          mkdir -p out
+          cp work/build.log out/build.log 2>/dev/null || true
+          tail -n 60 work/build.log 2>/dev/null || true
+      - name: Контрольные суммы
+        run: cd out && sha256sum *.iso > SHA256SUMS && cat SHA256SUMS && ls -la
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kroha-iso
+          path: |
+            out/*.iso
+            out/SHA256SUMS
+            out/*.packages
+          retention-days: 14
+          compression-level: 0
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: build-log
+          path: out/build.log
+          retention-days: 7
+
+  test-qemu:
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [uefi, bios]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { name: kroha-iso, path: out }
+      - name: QEMU
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq qemu-system-x86 ovmf netpbm
+          if [ -e /dev/kvm ]; then
+            echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666"' | sudo tee /etc/udev/rules.d/99-kvm.rules
+            sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
+          fi
+      - name: Смоук-тест (${{ matrix.mode }})
+        run: TIMEOUT=900 bash scripts/test-qemu.sh out/*.iso ${{ matrix.mode }} out/qemu-${{ matrix.mode }}
+      - name: Отчёт
+        if: always()
+        run: |
+          {
+            echo "### QEMU ${{ matrix.mode }}"
+            echo '```'
+            cat out/qemu-${{ matrix.mode }}/summary.txt 2>/dev/null
+            grep "KROHA-SMOKE" out/qemu-${{ matrix.mode }}/serial.log 2>/dev/null | head -n 60
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: qemu-${{ matrix.mode }}
+          path: out/qemu-${{ matrix.mode }}/
+          retention-days: 14
+
+  release:
+    needs: [build, test-qemu]
+    if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { name: kroha-iso, path: out }
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'latest' }}
+          name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'Kroha OS — свежая сборка' }}
+          prerelease: ${{ github.ref == 'refs/heads/main' }}
+          make_latest: ${{ startsWith(github.ref, 'refs/tags/') }}
+          body: |
+            Образ Kroha OS для записи на флешку. Инструкция — в README репозитория.
+            Проверено автоматически в QEMU (UEFI и BIOS). На реальном железе — смотри README.
+          files: |
+            out/*.iso
+            out/SHA256SUMS

@@ -1,0 +1,59 @@
+/* Лаунчер Kroha OS: полноэкранная сетка поверх размытого рабочего стола */
+* {
+    bg:        rgba(@BG_RGB@, 0.50);
+    fg:        @TEXT@;
+    dim:       @TEXT_DIM@;
+    accent:    @ACCENT@;
+    chip:      rgba(255, 255, 255, 0.10);
+    chipline:  rgba(255, 255, 255, 0.14);
+    sel:       rgba(255, 255, 255, 0.12);
+    background-color: transparent;
+    text-color: @fg;
+    font: "@FONT_UI@ 10";
+}
+window {
+    fullscreen: true;
+    background-color: @bg;
+    padding: 70px 150px 40px;
+}
+mainbox { children: [ inputbar, mode-switcher, listview ]; spacing: 0; }
+inputbar {
+    children: [ textbox-icon, entry ];
+    margin: 0 260px;
+    padding: 11px 18px;
+    spacing: 12px;
+    border: 1px;
+    border-radius: 999px;
+    border-color: @chipline;
+    background-color: @chip;
+}
+textbox-icon { expand: false; str: "⌕"; font: "@FONT_UI@ 13"; text-color: @dim; }
+entry { placeholder: "Поиск программ…"; placeholder-color: @dim; cursor-color: @accent; font: "@FONT_UI@ 11"; }
+mode-switcher { margin: 16px 360px 22px; spacing: 8px; }
+button { padding: 6px 16px; border-radius: 999px; text-color: @dim; horizontal-align: 0.5; font: "@FONT_UI@ SemiBold 9"; }
+button selected { background-color: @accent; text-color: @BG@; }
+listview {
+    columns: 7;
+    lines: 4;
+    spacing: 6px 10px;
+    cycle: false;
+    dynamic: true;
+    layout: vertical;
+    fixed-columns: true;
+    scrollbar: false;
+}
+element {
+    orientation: vertical;
+    padding: 12px 4px 10px;
+    spacing: 8px;
+    border-radius: 16px;
+}
+element selected.normal, element selected.active {
+    background-color: @sel;
+    border: 2px;
+    border-color: @accent;
+}
+element-icon { size: 56px; horizontal-align: 0.5; cursor: inherit; }
+element-text { horizontal-align: 0.5; vertical-align: 0.5; cursor: inherit; }
+message { margin: 0 260px 10px; }
+textbox { horizontal-align: 0.5; text-color: @dim; }

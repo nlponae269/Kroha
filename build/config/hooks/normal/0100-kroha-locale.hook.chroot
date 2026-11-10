@@ -1,0 +1,16 @@
+#!/bin/sh
+# Русская локаль по умолчанию, раскладки us,ru (Alt+Shift), Москва.
+set -e
+sed -i -e 's/^# *\(ru_RU.UTF-8 UTF-8\)/\1/' -e 's/^# *\(en_US.UTF-8 UTF-8\)/\1/' /etc/locale.gen
+locale-gen
+update-locale LANG=ru_RU.UTF-8 LANGUAGE=ru_RU:ru
+cat > /etc/default/keyboard <<'KBD'
+XKBMODEL="pc105"
+XKBLAYOUT="us,ru"
+XKBVARIANT=","
+XKBOPTIONS="grp:alt_shift_toggle"
+BACKSPACE="guess"
+KBD
+sed -i 's/^FONTFACE=.*/FONTFACE="Terminus"/; s/^FONTSIZE=.*/FONTSIZE="8x16"/; s/^CODESET=.*/CODESET="CyrSlav"/' /etc/default/console-setup 2>/dev/null || true
+ln -sf /usr/share/zoneinfo/Europe/Moscow /etc/localtime
+echo "Europe/Moscow" > /etc/timezone

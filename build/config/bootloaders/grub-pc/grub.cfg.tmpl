@@ -1,0 +1,21 @@
+source /boot/grub/config.cfg
+
+menuentry "Запустить @OS_NAME@" --hotkey=l {
+	linux	@KERNEL_LIVE@ @APPEND_LIVE@
+	initrd	@INITRD_LIVE@
+}
+menuentry "Запустить @OS_NAME@ (безопасная графика — если чёрный экран)" --hotkey=s {
+	linux	@KERNEL_LIVE@ @LB_BOOTAPPEND_LIVE_FAILSAFE@ findiso=${iso_path}
+	initrd	@INITRD_LIVE@
+}
+if @ENABLE_VERIFY_CHECKSUMS@; then
+menuentry "Проверить флешку на ошибки" --hotkey=v {
+	linux	@KERNEL_LIVE@ @APPEND_VERIFY_CHECKSUMS@
+	initrd	@INITRD_LIVE@
+}
+fi
+if [ "${grub_platform}" = "efi" ]; then
+menuentry "Настройки UEFI (BIOS)" --hotkey=f {
+	fwsetup
+}
+fi

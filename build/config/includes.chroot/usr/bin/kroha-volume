@@ -1,0 +1,18 @@
+#!/bin/sh
+# Громкость с клавиш + уведомление с полосой (PipeWire / wpctl)
+sink=@DEFAULT_AUDIO_SINK@
+case "$1" in
+	up) wpctl set-mute $sink 0; wpctl set-volume -l 1.0 $sink 5%+ ;;
+	down) wpctl set-volume $sink 5%- ;;
+	mute) wpctl set-mute $sink toggle ;;
+	micmute) wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
+		if wpctl get-volume @DEFAULT_AUDIO_SOURCE@ | grep -q MUTED; then t="Микрофон выключен"; else t="Микрофон включён"; fi
+		exec dunstify -a kroha-volume -r 9911 -i audio-input-microphone "$t" ;;
+esac
+out=$(wpctl get-volume $sink)
+vol=$(echo "$out" | awk '{printf "%d", $2*100}')
+if echo "$out" | grep -q MUTED; then icon=audio-volume-muted; text="Звук выключен"
+elif [ "$vol" -lt 34 ]; then icon=audio-volume-low; text="Громкость $vol%"
+elif [ "$vol" -lt 67 ]; then icon=audio-volume-medium; text="Громкость $vol%"
+else icon=audio-volume-high; text="Громкость $vol%"; fi
+dunstify -a kroha-volume -r 9910 -t 1500 -i "$icon" -h int:value:"$vol" "$text"

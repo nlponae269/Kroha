@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Программы
+Comment=Все программы (Win)
+Exec=kroha-launcher
+Icon=kroha-logo
+NoDisplay=true

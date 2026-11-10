@@ -1,0 +1,64 @@
+# Ядро, микрокод, прошивки под HP 15-bw0xx (AMD A10-9620P, R5 + R7 M340, RTL8723DE, RTL8168)
+linux-image-amd64
+amd64-microcode
+firmware-amd-graphics
+firmware-realtek
+firmware-misc-nonfree
+# Базовая система
+systemd-timesyncd
+dbus-user-session
+sudo
+locales
+console-setup
+keyboard-configuration
+tzdata
+bash-completion
+less
+nano
+ca-certificates
+wget
+file
+pciutils
+usbutils
+xdg-utils
+xdg-user-dirs
+# Сеть
+network-manager
+network-manager-gnome
+wpasupplicant
+iw
+wireless-regdb
+# Звук
+pipewire-audio
+wireplumber
+pipewire-pulse
+rtkit
+pavucontrol
+pasystray
+# Bluetooth (служба стартует по требованию)
+bluez
+blueman
+# Питание, память, диски
+xfce4-power-manager
+upower
+tlp
+zram-tools
+udisks2
+gvfs
+ntfs-3g
+exfatprogs
+dosfstools
+polkitd
+pkexec
+lxpolkit
+# Загрузчик и заставка
+plymouth
+plymouth-label
+grub-efi-amd64-bin
+grub-efi-amd64-signed
+grub-pc-bin
+grub2-common
+shim-signed
+efibootmgr
+os-prober
+fonts-dejavu-core

@@ -1,0 +1,30 @@
+#!/bin/sh
+# Службы: только нужное. Цель — быстрая загрузка и ≤ 350 МБ ОЗУ после входа.
+set -e
+en() { systemctl enable "$@" 2>/dev/null || true; }
+dis() { systemctl disable "$@" 2>/dev/null || true; }
+mask() { systemctl mask "$@" 2>/dev/null || true; }
+
+en fstrim.timer tlp.service zramswap.service lightdm.service NetworkManager.service systemd-timesyncd.service
+en kroha-smoketest.service
+
+# Ждать сеть при загрузке не нужно (экономит секунды)
+dis NetworkManager-wait-online.service
+dis e2scrub_reap.service e2scrub_all.timer
+dis apt-daily-upgrade.timer
+dis man-db.timer 2>/dev/null || true
+# TLP сам управляет радио; эти службы с ним конфликтуют
+mask systemd-rfkill.service systemd-rfkill.socket
+
+# Bluetooth: служба не стартует при загрузке, но запускается сама,
+# когда открываешь «Bluetooth» (D-Bus-активация через алиас)
+dis bluetooth.service
+ln -sf /usr/lib/systemd/system/bluetooth.service /etc/systemd/system/dbus-org.bluez.service
+
+# Ничего лишнего: проверка, что тяжёлые/ненужные пакеты не просочились
+for p in cups cups-daemon avahi-daemon modemmanager snapd flatpak pulseaudio gnome-shell plasma-desktop libreoffice-core; do
+	if dpkg -s "$p" >/dev/null 2>&1; then
+		echo "Удаляю лишний пакет: $p"
+		apt-get purge -y "$p" || true
+	fi
+done

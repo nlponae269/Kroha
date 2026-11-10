@@ -1,0 +1,13 @@
+#!/bin/sh
+# Меню выключения Kroha OS
+lock="Заблокировать"; logout="Выйти из сеанса"; sleep="Сон"; reboot="Перезагрузить"; off="Выключить"
+if [ -d /run/live/medium ]; then items="$sleep\n$reboot\n$off"; else items="$lock\n$sleep\n$logout\n$reboot\n$off"; fi
+choice=$(printf "%b" "$items" | rofi -dmenu -i -no-custom -p "" -mesg "Что сделать?" \
+	-theme /usr/share/rofi/themes/kroha-menu.rasi)
+case "$choice" in
+	"$lock") kroha-lock ;;
+	"$sleep") systemctl suspend ;;
+	"$logout") openbox --exit ;;
+	"$reboot") systemctl reboot ;;
+	"$off") systemctl poweroff ;;
+esac

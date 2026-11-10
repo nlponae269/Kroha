@@ -1,0 +1,77 @@
+#!/bin/sh
+# Программы по умолчанию и чистка лаунчера от служебных пунктов.
+set -e
+update-alternatives --set x-terminal-emulator /usr/bin/lxterminal 2>/dev/null || true
+update-alternatives --set x-www-browser /usr/bin/firefox-esr 2>/dev/null || true
+update-alternatives --set x-session-manager /usr/bin/openbox-session 2>/dev/null || true
+
+mkdir -p /etc/xdg
+cat > /etc/xdg/mimeapps.list <<'MIME'
+[Default Applications]
+x-scheme-handler/http=firefox-esr.desktop
+x-scheme-handler/https=firefox-esr.desktop
+text/html=firefox-esr.desktop
+application/pdf=qpdfview.desktop
+text/plain=org.xfce.mousepad.desktop
+image/png=viewnior.desktop
+image/jpeg=viewnior.desktop
+image/gif=viewnior.desktop
+image/webp=viewnior.desktop
+image/bmp=viewnior.desktop
+image/svg+xml=viewnior.desktop
+video/mp4=mpv.desktop
+video/x-matroska=mpv.desktop
+video/webm=mpv.desktop
+video/x-msvideo=mpv.desktop
+video/quicktime=mpv.desktop
+audio/mpeg=mpv.desktop
+audio/ogg=mpv.desktop
+audio/flac=mpv.desktop
+audio/x-wav=mpv.desktop
+application/zip=xarchiver.desktop
+application/x-7z-compressed=xarchiver.desktop
+application/x-rar=xarchiver.desktop
+application/x-tar=xarchiver.desktop
+application/gzip=xarchiver.desktop
+inode/directory=pcmanfm.desktop
+MIME
+
+# Скрыть из лаунчера служебные пункты (копия с NoDisplay=true в /usr/local имеет приоритет)
+mkdir -p /usr/local/share/applications
+for f in openbox obconf rofi rofi-theme-selector jgmenu jgmenu-x tint2 tint2conf picom compton \
+	lxpolkit gxkb pasystray xfce4-power-manager-settings nm-applet blueman-adapters \
+	calamares calamares-install-debian install-debian debian-uxterm debian-xterm \
+	pcmanfm-desktop-pref libfm-pref-apps lxappearance-obconf display-im6.q16 xdg-user-dirs \
+	org.xfce.mousepad-settings mpv-mpris vim nano lxterminal-preferences; do
+	src=/usr/share/applications/$f.desktop
+	[ -f "$src" ] || continue
+	sed -e '/^NoDisplay=/d' -e 's/^\[Desktop Entry\]$/[Desktop Entry]\nNoDisplay=true/' "$src" > "/usr/local/share/applications/$f.desktop"
+done
+# Понятные русские имена в сетке лаунчера
+rename() { # rename файл "Имя"
+	src=/usr/share/applications/$1.desktop
+	[ -f "$src" ] || return 0
+	sed -e '/^Name\[ru\]=/d' -e "s/^Name=\(.*\)$/Name=\1\nName[ru]=$2/" "$src" > "/usr/local/share/applications/$1.desktop"
+}
+rename firefox-esr "Firefox"
+rename pcmanfm "Файлы"
+rename lxterminal "Терминал"
+rename org.xfce.mousepad "Блокнот"
+rename mpv "Видео"
+rename viewnior "Фото"
+rename qpdfview "PDF"
+rename galculator "Калькулятор"
+rename xarchiver "Архивы"
+rename org.xfce.screenshooter "Снимок экрана"
+rename synaptic "Программы"
+rename pavucontrol "Звук"
+rename blueman-manager "Bluetooth"
+rename lxtask "Диспетчер задач"
+rename lxappearance "Оформление"
+rename arandr "Экраны"
+rename nm-connection-editor "Сеть"
+rename xfce4-power-manager-settings "Питание"
+update-desktop-database -q /usr/local/share/applications 2>/dev/null || true
+
+# mpv: в Debian пункт «mpv» без русского имени, а терминальный вариант не нужен
+rm -f /usr/local/share/applications/mpv-mpris.desktop

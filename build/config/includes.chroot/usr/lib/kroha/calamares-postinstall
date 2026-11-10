@@ -1,0 +1,60 @@
+#!/bin/sh
+# Вызывается Calamares (shellprocess@kroha) после установки загрузчика.
+# $1 — корень установленной системы.
+ROOT="$1"
+if [ -z "$ROOT" ] || [ ! -d "$ROOT/etc" ]; then echo "нет корня системы: $ROOT"; exit 1; fi
+. "$ROOT/etc/os-release"
+log() { echo "kroha-postinstall: $*"; }
+
+# 1. EFI: резервный загрузчик EFI/BOOT — только если на диске нет Windows
+ESP="$ROOT/boot/efi"
+if [ -d /sys/firmware/efi ] && [ -d "$ESP/EFI/debian" ]; then
+	efi_dir=$(find "$ESP/EFI" -maxdepth 1 -iname microsoft | head -n1)
+	boot_dir=$(find "$ESP/EFI" -maxdepth 1 -iname boot | head -n1)
+	if [ -z "$efi_dir" ] && { [ -z "$boot_dir" ] || [ -z "$(find "$boot_dir" -maxdepth 1 -iname bootx64.efi)" ]; }; then
+		log "Windows не найдена — ставлю резервный загрузчик EFI/BOOT"
+		mkdir -p "$ESP/EFI/BOOT"
+		if [ -f "$ESP/EFI/debian/shimx64.efi" ]; then
+			cp "$ESP/EFI/debian/shimx64.efi" "$ESP/EFI/BOOT/BOOTX64.EFI"
+			cp "$ESP/EFI/debian/grubx64.efi" "$ESP/EFI/BOOT/grubx64.efi"
+			[ -f "$ESP/EFI/debian/mmx64.efi" ] && cp "$ESP/EFI/debian/mmx64.efi" "$ESP/EFI/BOOT/mmx64.efi"
+		else
+			cp "$ESP/EFI/debian/grubx64.efi" "$ESP/EFI/BOOT/BOOTX64.EFI"
+		fi
+		cp "$ESP/EFI/debian/grub.cfg" "$ESP/EFI/BOOT/grub.cfg" 2>/dev/null
+	else
+		log "найдена Windows или чужой EFI/BOOT — резервный загрузчик не трогаю"
+	fi
+
+	# 2. Красивое имя в меню прошивки (F9): «Kroha OS» вместо «debian»
+	if command -v efibootmgr >/dev/null; then
+		efibootmgr 2>/dev/null | sed -n 's/^Boot\([0-9A-Fa-f]\{4\}\)\*\{0,1\} debian\b.*/\1/p' | while read -r num; do
+			disk=$(findmnt -n -o SOURCE "$ESP")
+			parent=$(lsblk -n -o PKNAME "$disk" | head -n1)
+			part=$(cat "/sys/class/block/$(basename "$disk")/partition" 2>/dev/null)
+			loader='\EFI\debian\shimx64.efi'
+			[ -f "$ESP/EFI/debian/shimx64.efi" ] || loader='\EFI\debian\grubx64.efi'
+			if [ -n "$parent" ] && [ -n "$part" ] && \
+			   efibootmgr -q -c -d "/dev/$parent" -p "$part" -L "$NAME" -l "$loader"; then
+				efibootmgr -q -b "$num" -B && log "запись EFI переименована в «$NAME»"
+			fi
+		done
+	fi
+fi
+
+# 3. Раскладка: английская по умолчанию + русская, Alt+Shift
+kbd="$ROOT/etc/default/keyboard"
+if [ -f "$kbd" ] && grep -q '^XKBLAYOUT=.*ru' "$kbd"; then
+	sed -i -e 's/^XKBLAYOUT=.*/XKBLAYOUT="us,ru"/' -e 's/^XKBVARIANT=.*/XKBVARIANT=","/' \
+		-e 's/^XKBOPTIONS=.*/XKBOPTIONS="grp:alt_shift_toggle"/' "$kbd"
+	rm -f "$ROOT/etc/X11/xorg.conf.d/00-keyboard.conf"
+	log "раскладка us,ru (Alt+Shift)"
+fi
+
+# 4. Убрать то, что нужно только в live-режиме
+rm -f "$ROOT/usr/share/applications/kroha-install.desktop" \
+	"$ROOT/usr/share/applications/calamares-install-debian.desktop"
+rm -f "$ROOT"/home/*/Desktop/kroha-install.desktop "$ROOT"/home/*/Рабочий\ стол/kroha-install.desktop 2>/dev/null
+chroot "$ROOT" systemctl disable kroha-smoketest.service >/dev/null 2>&1
+log "готово"
+exit 0

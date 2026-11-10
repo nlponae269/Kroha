@@ -1,0 +1,58 @@
+
+/* ===== Kroha OS: поверх перекрашенной Arc-Dark ===== */
+/* Флажки, переключатели и switch без PNG Arc (они синие) — чистым CSS */
+check, radio {
+  min-width: 16px; min-height: 16px; margin: 0 4px;
+  border: 1px solid @BORDER@; background-image: none; background-color: @SURFACE@;
+  -gtk-icon-source: none; color: @BG@; border-radius: 5px;
+}
+radio { border-radius: 100%; }
+check:hover, radio:hover { border-color: @ACCENT@; }
+check:checked, radio:checked, check:indeterminate, radio:indeterminate {
+  background-color: @ACCENT@; border-color: @ACCENT@;
+}
+check:checked { -gtk-icon-source: -gtk-icontheme("object-select-symbolic"); }
+radio:checked { -gtk-icon-source: -gtk-icontheme("media-record-symbolic"); }
+check:indeterminate, radio:indeterminate { -gtk-icon-source: -gtk-icontheme("list-remove-symbolic"); }
+check:disabled, radio:disabled { opacity: 0.5; }
+menuitem check, menuitem radio, modelbutton check, modelbutton radio { margin: 0 6px 0 0; }
+
+switch {
+  font-size: 0; min-width: 40px; min-height: 22px; padding: 0;
+  background-image: none; background-color: @SURFACE_HI@;
+  border: 1px solid @BORDER@; border-radius: 999px;
+}
+switch:checked { background-color: @ACCENT@; border-color: @ACCENT@; }
+switch slider {
+  min-width: 18px; min-height: 18px; margin: 1px; padding: 0;
+  background-image: none; background-color: @TEXT@; border: none; border-radius: 999px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+switch:disabled { opacity: 0.5; }
+
+/* Скругления и акценты */
+button, entry, spinbutton, combobox button { border-radius: @RADIUS@px; }
+button.suggested-action { background-image: none; background-color: @ACCENT@; color: @BG@; border-color: @ACCENT_DARK@; }
+button.suggested-action:hover { background-color: @ACCENT_LIGHT@; }
+button.destructive-action { background-image: none; background-color: @ERROR@; color: #ffffff; }
+scale highlight, progressbar progress, levelbar block.filled { background-color: @ACCENT@; border-color: @ACCENT@; }
+scale slider { background-color: @TEXT@; border-color: @BORDER@; }
+entry:focus { border-color: @ACCENT@; }
+tooltip, tooltip.background { border-radius: 8px; background-color: rgba(@BG_RGB@, 0.94); color: @TEXT@; }
+menu, .menu, .context-menu { border-radius: 8px; padding: 4px 0; }
+menu menuitem:hover, .menu menuitem:hover { background-color: @ACCENT_DARK@; color: #ffffff; }
+headerbar { background-color: @BG@; border-color: @BG@; }
+
+/* ===== Экран входа (lightdm-gtk-greeter) ===== */
+#panel_window { background-color: rgba(@BG_RGB@, 0.55); color: @TEXT@; font-weight: 600; }
+#panel_window menubar, #panel_window menubar > menuitem { background: transparent; color: @TEXT@; }
+#login_window, #shutdown_dialog, #restart_dialog {
+  background-color: rgba(@BG_RGB@, 0.78); color: @TEXT@;
+  border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 18px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+}
+#login_window #content_frame, #login_window #buttonbox_frame { background: transparent; border: none; }
+#login_window entry { border-radius: 12px; padding: 8px 12px; background-color: rgba(255, 255, 255, 0.08); }
+#login_window #login_button { background-image: none; background-color: @ACCENT@; color: @BG@; border-radius: 12px; font-weight: 700; padding: 6px 18px; }
+#login_window #login_button:hover { background-color: @ACCENT_LIGHT@; }
+#login_window #user_combobox { font-size: 15px; font-weight: 700; }

@@ -1,0 +1,28 @@
+#!/bin/sh
+# Пишет в последовательный порт (QEMU -serial) отчёт о загрузке live-системы.
+out=/dev/ttyS0
+[ -w "$out" ] || out=/dev/console
+say() { echo "KROHA-SMOKE: $*" > "$out"; }
+say "start"
+user=$(awk -F= '$1=="autologin-user"{print $2}' /etc/lightdm/lightdm.conf 2>/dev/null | tail -n1)
+# ждём рабочий стол: панели tint2 запущены у пользователя
+i=0
+while [ $i -lt 600 ]; do
+	pgrep -x tint2 >/dev/null && pgrep -x pcmanfm >/dev/null && break
+	sleep 2; i=$((i + 2))
+done
+say "graphical.target=$(systemctl is-active graphical.target)"
+say "lightdm=$(systemctl is-active lightdm)"
+say "session-user=${user:-?} tint2=$(pgrep -c -x tint2) pcmanfm=$(pgrep -c -x pcmanfm) openbox=$(pgrep -c -x openbox) picom=$(pgrep -c -x picom)"
+sleep 45  # даём сеансу «успокоиться» перед замером памяти
+free -m | while read -r l; do say "free: $l"; done
+say "used-mb=$(free -m | awk '/^Mem:/{print $3}')"
+systemd-analyze 2>/dev/null | while read -r l; do say "analyze: $l"; done
+systemd-analyze blame 2>/dev/null | head -n 15 | while read -r l; do say "blame: $l"; done
+systemctl --failed --no-legend 2>/dev/null | while read -r l; do say "failed: $l"; done
+ps -eo rss,comm --sort=-rss | head -n 15 | while read -r l; do say "rss: $l"; done
+if [ "$(systemctl is-active graphical.target)" = active ] && pgrep -x tint2 >/dev/null; then
+	say "RESULT=PASS"
+else
+	say "RESULT=FAIL"
+fi

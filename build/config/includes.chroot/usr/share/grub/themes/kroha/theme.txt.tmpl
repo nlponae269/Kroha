@@ -1,0 +1,70 @@
+# Тема GRUB @OS_NAME@ (установленная система)
+title-text: ""
+desktop-image: "background.png"
+desktop-color: "@BG@"
+terminal-font: "DejaVu Sans Mono Regular 14"
+
++ image {
+	left = 50%-36
+	top = 18%
+	width = 72
+	height = 72
+	file = "logo.png"
+}
++ label {
+	left = 0
+	top = 18%+86
+	width = 100%
+	align = "center"
+	text = "@OS_NAME@"
+	color = "@TEXT@"
+	font = "DejaVu Sans Bold 24"
+}
++ boot_menu {
+	left = 50%-260
+	top = 40%
+	width = 520
+	height = 40%
+	item_font = "DejaVu Sans Regular 16"
+	selected_item_font = "DejaVu Sans Bold 16"
+	item_color = "@TEXT_DIM@"
+	selected_item_color = "@BG@"
+	item_height = 40
+	item_padding = 16
+	item_spacing = 6
+	icon_width = 0
+	icon_height = 0
+	item_icon_space = 0
+	selected_item_pixmap_style = "select_*.png"
+	scrollbar = false
+}
++ progress_bar {
+	id = "__timeout__"
+	left = 50%-160
+	top = 86%
+	width = 320
+	height = 4
+	fg_color = "@ACCENT@"
+	bg_color = "@SURFACE_HI@"
+	border_color = "@SURFACE_HI@"
+	show_text = false
+}
++ label {
+	id = "__timeout__"
+	left = 0
+	top = 86%+14
+	width = 100%
+	align = "center"
+	color = "@TEXT_DIM@"
+	font = "DejaVu Sans Regular 14"
+	text = "Запуск через %d с"
+}
++ label {
+	left = 0
+	top = 100%-32
+	width = 100%
+	align = "center"
+	color = "@TEXT_DIM@"
+	font = "DejaVu Sans Regular 14"
+	text = "↑ ↓ — выбрать,  Enter — загрузить,  e — изменить параметры"
+}

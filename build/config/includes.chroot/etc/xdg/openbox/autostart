@@ -1,0 +1,28 @@
+# Автозапуск сеанса Kroha OS (Openbox). Свои команды — в ~/.config/kroha/autostart
+xdg-user-dirs-update >/dev/null 2>&1
+xrdb -merge /etc/xdg/kroha/Xresources 2>/dev/null
+
+# Сначала композитор (размытие дока), потом панели — так tint2 сразу полупрозрачный
+kroha-effects start
+pcmanfm --desktop --profile kroha &
+tint2 -c /etc/xdg/kroha/tint2/topbar.tint2rc &
+tint2 -c /etc/xdg/kroha/tint2/dock.tint2rc &
+
+# Одиночное нажатие Win открывает лаунчер (Win+буква работают как обычно)
+xcape -e 'Super_L=Alt_L|F1' &
+
+lxpolkit &
+nm-applet &
+pasystray --notify=none &
+gxkb &
+xfce4-power-manager &
+
+if [ -d /run/live/medium ]; then
+	# Live-режим: значок установщика и приветствие, без блокировки экрана
+	kroha-live-setup &
+else
+	light-locker --no-lock-on-suspend &
+	xss-lock -l -- kroha-lock &
+fi
+
+[ -r "$HOME/.config/kroha/autostart" ] && . "$HOME/.config/kroha/autostart"

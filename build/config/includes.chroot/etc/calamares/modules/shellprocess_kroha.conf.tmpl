@@ -1,0 +1,10 @@
+# Донастройка установленной @OS_NAME@ (EFI-запись, раскладка, чистка live-файлов)
+---
+dontChroot: true
+timeout: 300
+script:
+  - command: "/usr/lib/kroha/calamares-postinstall ${ROOT}"
+    timeout: 300
+i18n:
+  name: "Настройка @OS_NAME@"
+  name[ru]: "Настройка @OS_NAME@"

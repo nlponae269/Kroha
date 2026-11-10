@@ -1,0 +1,49 @@
+# picom для Kroha OS: размытие дока/строки/лаунчера/уведомлений, скругления окон.
+# Запускается через kroha-effects (только при аппаратном ускорении).
+backend = "glx";
+vsync = true;
+use-damage = true;
+glx-no-stencil = true;
+detect-rounded-corners = true;
+detect-client-opacity = true;
+detect-transient = true;
+unredir-if-possible = true;
+
+blur: {
+  method = "dual_kawase";
+  strength = 7;
+};
+
+shadow = false;
+shadow-radius = 18;
+shadow-opacity = 0.35;
+shadow-offset-x = -14;
+shadow-offset-y = -10;
+
+fading = true;
+fade-in-step = 0.08;
+fade-out-step = 0.08;
+fade-delta = 8;
+
+corner-radius = 0;
+
+rules: (
+  { match = "window_type = 'normal' || window_type = 'dialog' || window_type = 'utility'";
+    corner-radius = 12; shadow = true; },
+  { match = "name = 'kroha-dock'";
+    blur-background = true; corner-radius = @DOCK_RADIUS@; shadow = true; },
+  { match = "name = 'kroha-topbar'";
+    blur-background = true; corner-radius = 0; shadow = false; },
+  { match = "class_g = 'Rofi'";
+    blur-background = true; corner-radius = 0; shadow = false; },
+  { match = "class_g = 'Dunst'";
+    blur-background = true; corner-radius = 14; shadow = true; },
+  { match = "window_type = 'popup_menu' || window_type = 'dropdown_menu' || window_type = 'menu'";
+    blur-background = true; corner-radius = 8; shadow = true; },
+  { match = "window_type = 'tooltip'";
+    blur-background = true; corner-radius = 8; shadow = false; },
+  { match = "window_type = 'desktop' || fullscreen";
+    corner-radius = 0; shadow = false; },
+  { match = "window_type = 'dnd' || window_type = 'dock' && name != 'kroha-dock' && name != 'kroha-topbar'";
+    shadow = false; },
+);

@@ -1,0 +1,151 @@
+# Kroha OS — парящий док снизу по центру (закреплённые программы | открытые окна)
+# Размытие под доком делает picom (правило для окна kroha-dock).
+#-------------------------------------
+# Фон 1: стекло дока
+rounded = @DOCK_RADIUS@
+border_width = 1
+border_sides = TBLR
+border_content_tint_weight = 0
+background_content_tint_weight = 0
+background_color = @BG@ @GLASS_OPACITY@
+border_color = #FFFFFF 10
+background_color_hover = @BG@ @GLASS_OPACITY@
+border_color_hover = #FFFFFF 10
+background_color_pressed = @BG@ @GLASS_OPACITY@
+border_color_pressed = #FFFFFF 10
+
+# Фон 2: иконка (подсветка при наведении)
+rounded = 14
+border_width = 0
+border_sides = TBLR
+background_color = #FFFFFF 0
+border_color = #FFFFFF 0
+background_color_hover = #FFFFFF 12
+border_color_hover = #FFFFFF 0
+background_color_pressed = #FFFFFF 18
+border_color_pressed = #FFFFFF 0
+
+# Фон 3: запущенная программа (акцентная полоска снизу)
+rounded = 3
+border_width = 3
+border_sides = B
+background_color = #FFFFFF 0
+border_color = @ACCENT@ 70
+background_color_hover = #FFFFFF 12
+border_color_hover = @ACCENT@ 100
+background_color_pressed = #FFFFFF 18
+border_color_pressed = @ACCENT@ 100
+
+# Фон 4: активное окно
+rounded = 3
+border_width = 3
+border_sides = B
+background_color = #FFFFFF 12
+border_color = @ACCENT@ 100
+background_color_hover = #FFFFFF 16
+border_color_hover = @ACCENT@ 100
+background_color_pressed = #FFFFFF 20
+border_color_pressed = @ACCENT@ 100
+
+# Фон 5: подсказка
+rounded = 8
+border_width = 1
+border_sides = TBLR
+background_color = @PANEL@ 95
+border_color = #FFFFFF 10
+background_color_hover = @PANEL@ 95
+border_color_hover = #FFFFFF 10
+background_color_pressed = @PANEL@ 95
+border_color_pressed = #FFFFFF 10
+
+#-------------------------------------
+panel_items = L:T
+panel_size = 100% 68
+panel_margin = 0 10
+panel_padding = 10 8 6
+panel_background_id = 1
+wm_menu = 0
+panel_dock = 0
+panel_position = bottom center horizontal
+panel_layer = top
+panel_monitor = primary
+panel_shrink = 1
+autohide = 0
+strut_policy = follow_size
+panel_window_name = kroha-dock
+disable_transparency = 0
+mouse_effects = 1
+font_shadow = 0
+mouse_hover_icon_asb = 100 0 12
+mouse_pressed_icon_asb = 100 0 -8
+scale_relative_to_dpi = 0
+scale_relative_to_screen_height = 0
+
+#-------------------------------------
+# Разделитель между закреплёнными и открытыми
+separator = new
+separator_background_id = 0
+separator_color = #FFFFFF 14
+separator_style = line
+separator_size = 1
+separator_padding = 6 12
+
+#-------------------------------------
+# Закреплённые программы
+launcher_padding = 0 0 6
+launcher_background_id = 0
+launcher_icon_background_id = 2
+launcher_icon_size = 42
+launcher_icon_asb = 100 0 0
+launcher_icon_theme_override = 0
+startup_notifications = 1
+launcher_tooltip = 1
+launcher_item_app = /usr/share/applications/kroha-launcher.desktop
+launcher_item_app = firefox-esr.desktop
+launcher_item_app = pcmanfm.desktop
+launcher_item_app = lxterminal.desktop
+launcher_item_app = org.xfce.mousepad.desktop
+launcher_item_app = mpv.desktop
+launcher_item_app = synaptic.desktop
+
+#-------------------------------------
+# Открытые окна — только иконки
+taskbar_mode = single_desktop
+taskbar_hide_if_empty = 1
+taskbar_padding = 0 0 6
+taskbar_background_id = 0
+taskbar_active_background_id = 0
+taskbar_name = 0
+taskbar_hide_inactive_tasks = 0
+taskbar_hide_different_monitor = 0
+taskbar_always_show_all_desktop_tasks = 0
+taskbar_distribute_size = 0
+taskbar_sort_order = none
+task_align = center
+task_text = 0
+task_icon = 1
+task_centered = 1
+urgent_nb_of_blink = 8
+task_maximum_size = 54 54
+task_padding = 6 6 0
+task_tooltip = 1
+task_thumbnail = 0
+task_icon_asb = 100 0 0
+task_background_id = 3
+task_active_background_id = 4
+task_urgent_background_id = 4
+task_iconified_background_id = 3
+task_iconified_icon_asb = 70 0 0
+mouse_left = toggle_iconify
+mouse_middle = close
+mouse_right = none
+mouse_scroll_up = none
+mouse_scroll_down = none
+
+#-------------------------------------
+tooltip_show_timeout = 0.3
+tooltip_hide_timeout = 0.1
+tooltip_padding = 8 5
+tooltip_background_id = 5
+tooltip_font_color = @TEXT@ 100
+tooltip_font = @FONT_UI@ 9

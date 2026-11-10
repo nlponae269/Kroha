@@ -1,0 +1,15 @@
+[Unit]
+Description=Kroha OS smoke test (только live в виртуальной машине)
+ConditionVirtualization=vm
+ConditionPathExists=/run/live/medium
+After=graphical.target
+Wants=graphical.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/kroha/smoketest
+StandardOutput=journal+console
+TimeoutStartSec=900
+
+[Install]
+WantedBy=graphical.target

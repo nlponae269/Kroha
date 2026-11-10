@@ -1,0 +1,45 @@
+#!/bin/sh
+# Эффекты Kroha OS (picom: размытие и скругления).
+#   kroha-effects start   — запустить, если видеокарта с 3D-ускорением
+#   kroha-effects toggle  — включить/выключить (запоминается)
+#   kroha-effects on|off|auto
+conf_dir="${XDG_CONFIG_HOME:-$HOME/.config}/kroha"
+state_file="$conf_dir/effects"
+picom_conf="$conf_dir/picom.conf"
+[ -r "$picom_conf" ] || picom_conf=/etc/xdg/kroha/picom.conf
+
+gpu_ok() {
+	grep -qw kroha.noeffects /proc/cmdline && return 1
+	grep -qw nomodeset /proc/cmdline && return 1
+	for drv in /sys/class/drm/card*/device/driver; do
+		[ -e "$drv" ] || continue
+		case "$(basename "$(readlink -f "$drv")")" in
+			amdgpu|radeon|i915|xe|nouveau) return 0 ;;
+		esac
+	done
+	return 1
+}
+mode() { cat "$state_file" 2>/dev/null || echo auto; }
+running() { pgrep -u "$(id -u)" -x picom >/dev/null; }
+start() {
+	running && return 0
+	picom --config "$picom_conf" >/dev/null 2>&1 &
+}
+stop() { pkill -u "$(id -u)" -x picom; }
+remember() { mkdir -p "$conf_dir"; echo "$1" > "$state_file"; }
+
+case "$1" in
+	start)
+		case "$(mode)" in
+			on) start ;;
+			off) ;;
+			*) gpu_ok && start ;;
+		esac ;;
+	on) remember on; start ;;
+	off) remember off; stop ;;
+	auto) remember auto; stop; gpu_ok && start ;;
+	toggle)
+		if running; then remember off; stop; notify-send -i preferences-desktop-theme "Эффекты выключены" "Размытие и тени отключены — так быстрее."
+		else remember on; start; notify-send -i preferences-desktop-theme "Эффекты включены" "Размытие дока и скругления окон."; fi ;;
+	*) echo "Использование: kroha-effects start|toggle|on|off|auto"; exit 1 ;;
+esac

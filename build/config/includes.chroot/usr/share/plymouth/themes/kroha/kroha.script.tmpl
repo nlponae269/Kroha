@@ -1,0 +1,87 @@
+# Заставка @OS_NAME@: логотип, мягкое свечение и тонкая полоска прогресса
+Window.SetBackgroundTopColor(@BG_FLOAT@);
+Window.SetBackgroundBottomColor(@BG_FLOAT@);
+
+cx = Window.GetX() + Window.GetWidth() / 2;
+cy = Window.GetY() + Window.GetHeight() / 2;
+
+glow.image = Image("glow.png");
+glow.sprite = Sprite(glow.image);
+glow.sprite.SetPosition(cx - glow.image.GetWidth() / 2, cy - 40 - glow.image.GetHeight() / 2, 0);
+glow.sprite.SetOpacity(0.0);
+
+logo.image = Image("logo.png");
+logo.sprite = Sprite(logo.image);
+logo.sprite.SetPosition(cx - logo.image.GetWidth() / 2, cy - 40 - logo.image.GetHeight() / 2, 2);
+
+bar_bg.image = Image("bar-bg.png");
+bar_bg.sprite = Sprite(bar_bg.image);
+bar_x = cx - bar_bg.image.GetWidth() / 2;
+bar_y = cy + 60;
+bar_bg.sprite.SetPosition(bar_x, bar_y, 1);
+
+bar.original = Image("bar.png");
+bar.sprite = Sprite();
+bar.sprite.SetPosition(bar_x, bar_y, 2);
+
+t = 0;
+fun refresh_cb() {
+	t++;
+	# медленное «дыхание» свечения за логотипом
+	glow.sprite.SetOpacity(0.35 + 0.25 * Math.Sin(t / 40));
+}
+Plymouth.SetRefreshFunction(refresh_cb);
+
+fun progress_cb(duration, progress) {
+	w = Math.Int(bar.original.GetWidth() * progress);
+	if (w < 4) w = 4;
+	bar.sprite.SetImage(bar.original.Scale(w, bar.original.GetHeight()));
+}
+Plymouth.SetBootProgressFunction(progress_cb);
+
+# ---- ввод пароля (зашифрованный диск) ----
+prompt.sprite = Sprite();
+entry.image = Image("entry.png");
+entry.sprite = Sprite();
+bullets = [];
+
+fun display_normal_cb() {
+	prompt.sprite.SetOpacity(0);
+	entry.sprite.SetOpacity(0);
+	for (i = 0; bullets[i]; i++) bullets[i].SetOpacity(0);
+	bar_bg.sprite.SetOpacity(1);
+	bar.sprite.SetOpacity(1);
+}
+
+fun display_password_cb(prompt_text, bullet_count) {
+	bar_bg.sprite.SetOpacity(0);
+	bar.sprite.SetOpacity(0);
+	prompt.sprite.SetImage(Image.Text("Пароль для диска", @TEXT_FLOAT@, 1, "@FONT_UI@ 12"));
+	prompt.sprite.SetPosition(cx - prompt.sprite.GetImage().GetWidth() / 2, bar_y - 6, 3);
+	prompt.sprite.SetOpacity(1);
+	entry.sprite.SetImage(entry.image);
+	entry.sprite.SetPosition(cx - entry.image.GetWidth() / 2, bar_y + 22, 3);
+	entry.sprite.SetOpacity(1);
+	for (i = 0; bullets[i]; i++) bullets[i].SetOpacity(0);
+	dot = Image.Text("●", @ACCENT_FLOAT@, 1, "DejaVu Sans 12");
+	for (i = 0; i < bullet_count && i < 24; i++) {
+		bullets[i] = Sprite(dot);
+		bullets[i].SetPosition(cx - entry.image.GetWidth() / 2 + 16 + i * 14, bar_y + 22 + entry.image.GetHeight() / 2 - dot.GetHeight() / 2, 4);
+		bullets[i].SetOpacity(1);
+	}
+}
+Plymouth.SetDisplayNormalFunction(display_normal_cb);
+Plymouth.SetDisplayPasswordFunction(display_password_cb);
+
+# ---- сообщения ----
+message.sprite = Sprite();
+fun message_cb(text) {
+	message.sprite.SetImage(Image.Text(text, @TEXT_DIM_FLOAT@, 1, "@FONT_UI@ 10"));
+	message.sprite.SetPosition(cx - message.sprite.GetImage().GetWidth() / 2, Window.GetY() + Window.GetHeight() - 50, 5);
+}
+Plymouth.SetMessageFunction(message_cb);
+
+fun quit_cb() {
+	bar.sprite.SetImage(bar.original);
+}
+Plymouth.SetQuitFunction(quit_cb);

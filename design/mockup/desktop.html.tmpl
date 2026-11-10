@@ -80,7 +80,8 @@ body{font-family:"@FONT_UI@",sans-serif;font-size:13px;color:var(--text);
   box-shadow:0 12px 40px rgba(0,0,0,.35);z-index:30}
 .app{position:relative;width:52px;height:52px;border-radius:14px;display:grid;place-items:center}
 .app img{width:42px;height:42px}
-.app.run::after{content:"";position:absolute;bottom:-3px;left:18px;right:18px;height:3px;border-radius:3px;background:var(--accent)}
+.app.run::after{content:"";position:absolute;bottom:-2px;left:4px;right:4px;height:3px;border-radius:3px;background:rgba(@ACCENT_RGB@,.7)}
+.app.run.act::after{background:var(--accent)}
 .app.act{background:rgba(255,255,255,.12)}
 .sep{width:1px;height:34px;background:rgba(255,255,255,.14);margin:0 4px}
 .tip{position:absolute;bottom:64px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:12px;
@@ -129,7 +130,7 @@ body.l .toast,body.l .tip{display:none}
 <div class="toast">
   <img src="logo.svg" alt="">
   <div><b>Добро пожаловать в @OS_NAME@</b>
-  <p>Нажми <b style="display:inline">Win</b>, чтобы открыть программы. Установить систему — значок на рабочем столе.</p></div>
+  <p>Нажми Win, чтобы открыть программы.<br>Установить систему — значок «Установить Kroha OS» на рабочем столе.</p></div>
 </div>
 
 <div class="win">
@@ -181,16 +182,16 @@ body.l .toast,body.l .tip{display:none}
 </div>
 
 <div class="dock">
-  <div class="app act"><img src="logo.svg" alt=""></div>
-  <div class="sep"></div>
-  <div class="app run"><img src="icons/apps/firefox-esr.svg" alt=""></div>
-  <div class="app run"><img src="icons/apps/system-file-manager.svg" alt=""><div class="tip">Файлы</div></div>
+  <div class="app"><img src="logo.svg" alt=""></div>
+  <div class="app"><img src="icons/apps/firefox-esr.svg" alt=""></div>
+  <div class="app"><img src="icons/apps/system-file-manager.svg" alt=""><div class="tip">Файлы</div></div>
   <div class="app"><img src="icons/apps/utilities-terminal.svg" alt=""></div>
   <div class="app"><img src="icons/apps/accessories-text-editor.svg" alt=""></div>
   <div class="app"><img src="icons/apps/mpv.svg" alt=""></div>
   <div class="app"><img src="icons/apps/synaptic.svg" alt=""></div>
   <div class="sep"></div>
-  <div class="app"><img src="icons/places/user-trash.svg" alt=""></div>
+  <div class="app run"><img src="icons/apps/firefox-esr.svg" alt=""></div>
+  <div class="app run act"><img src="icons/apps/system-file-manager.svg" alt=""></div>
 </div>
 
 <script>
