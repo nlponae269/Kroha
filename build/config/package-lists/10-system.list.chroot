@@ -63,3 +63,8 @@ efibootmgr
 os-prober
 ucf
 fonts-dejavu-core
+# live-режим: создание пользователя kroha и автовход (рекомендации live-config/live-boot)
+user-setup
+iproute2
+rsync
+uuid-runtime
