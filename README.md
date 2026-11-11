@@ -25,7 +25,7 @@
 ### 1. Скачай образ
 
 1. Открой страницу **[Releases](https://github.com/nlponae269/Kroha/releases)**.
-2. Скачай файл `kroha-os-…-amd64.iso` (около 1,3 ГБ).
+2. Скачай файл `kroha-os-…-amd64.iso` (около 860 МБ).
 3. *(По желанию)* проверь, что файл скачался без ошибок: рядом лежит `SHA256SUMS`.
    - Linux: в папке с файлами выполни `sha256sum -c SHA256SUMS` — должно быть «OK».
    - Windows: `certutil -hashfile kroha-os-…-amd64.iso SHA256` и сравни с числом из `SHA256SUMS`.

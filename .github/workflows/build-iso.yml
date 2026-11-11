@@ -7,6 +7,11 @@ on:
     paths-ignore: ["README.md", "docs/**", "CLAUDE.md"]
   pull_request:
   workflow_dispatch:
+    inputs:
+      release:
+        description: "Опубликовать релиз с этой меткой (например v0.1). Пусто — только сборка."
+        required: false
+        default: ""
 
 concurrency:
   group: build-iso-${{ github.ref }}
@@ -134,20 +139,32 @@ jobs:
 
   release:
     needs: [build, test-qemu]
-    if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main'
+    # Релиз: метка v* или ветка main, либо ручной запуск с полем «release»
+    if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && inputs.release != '')
     runs-on: ubuntu-24.04
+    env:
+      TAG: ${{ inputs.release || (startsWith(github.ref, 'refs/tags/') && github.ref_name) || 'latest' }}
+      IS_MAIN: ${{ github.ref == 'refs/heads/main' && inputs.release == '' }}
     steps:
       - uses: actions/download-artifact@v4
         with: { name: kroha-iso, path: out }
       - uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'latest' }}
-          name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'Kroha OS — свежая сборка' }}
-          prerelease: ${{ github.ref == 'refs/heads/main' }}
-          make_latest: ${{ startsWith(github.ref, 'refs/tags/') }}
+          tag_name: ${{ env.TAG }}
+          target_commitish: ${{ github.sha }}
+          name: ${{ env.IS_MAIN == 'true' && 'Kroha OS — свежая сборка' || format('Kroha OS {0}', env.TAG) }}
+          prerelease: ${{ env.IS_MAIN == 'true' }}
+          make_latest: ${{ env.IS_MAIN != 'true' }}
           body: |
-            Образ Kroha OS для записи на флешку. Инструкция — в README репозитория.
-            Проверено автоматически в QEMU (UEFI и BIOS). На реальном железе — смотри README.
+            Образ **Kroha OS** для записи на флешку (≥ 4 ГБ) — файл `.iso` ниже.
+
+            **Как установить:** пошаговая инструкция — в [README](https://github.com/${{ github.repository }}#readme):
+            сделать копию файлов → записать ISO через Rufus/Ventoy → F9 при включении → «Установить Kroha OS».
+
+            ✅ Проверено автоматически в виртуальной машине (UEFI и BIOS): система загружается до рабочего стола.
+            ⚠️ На реальном HP 15-bw0xx ещё не проверялось — расскажи, что работает, а что нет, в Issues.
+
+            Проверка файла (необязательно): `sha256sum -c SHA256SUMS`.
           files: |
             out/*.iso
             out/SHA256SUMS
