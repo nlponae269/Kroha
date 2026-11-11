@@ -107,6 +107,10 @@ jobs:
     needs: build
     runs-on: ubuntu-24.04
     timeout-minutes: 40
+    # Debian-контейнер (зеркало deb.debian.org); --privileged даёт доступ к /dev/kvm
+    container:
+      image: debian:trixie
+      options: --privileged
     strategy:
       fail-fast: false
       matrix:
@@ -117,13 +121,12 @@ jobs:
         with: { name: kroha-iso, path: out }
       - name: QEMU
         run: |
-          sudo apt-get update -qq -o Acquire::Retries=5
-          sudo apt-get install -y -qq -o Acquire::Retries=5 qemu-system-x86 ovmf netpbm
-          if [ -e /dev/kvm ]; then
-            echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666"' | sudo tee /etc/udev/rules.d/99-kvm.rules
-            sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
-          fi
+          apt-get update -qq -o Acquire::Retries=5
+          DEBIAN_FRONTEND=noninteractive apt-get install -y -qq -o Acquire::Retries=5 \
+            qemu-system-x86 ovmf netpbm python3 procps
+          ls -la /dev/kvm || echo "KVM нет — будет медленно"
       - name: Смоук-тест (${{ matrix.mode }})
+        shell: bash
         run: TIMEOUT=900 bash scripts/test-qemu.sh out/*.iso ${{ matrix.mode }} out/qemu-${{ matrix.mode }}
       - name: Отчёт
         if: always()
