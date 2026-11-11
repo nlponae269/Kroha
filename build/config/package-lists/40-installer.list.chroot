@@ -2,3 +2,7 @@ calamares
 calamares-settings-debian
 # нужен установщику для распаковки системы на диск (рекомендация calamares)
 squashfs-tools
+# QML-модули Qt6 для слайд-шоу установщика (в Debian зависимость указана на Qt5)
+qml6-module-qtquick
+qml6-module-qtquick-window
+qml6-module-qtqml-workerscript

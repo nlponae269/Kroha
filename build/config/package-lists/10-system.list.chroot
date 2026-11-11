@@ -12,6 +12,8 @@ locales
 console-setup
 keyboard-configuration
 tzdata
+# hwclock: установщик настраивает часы BIOS (важно рядом с Windows)
+util-linux-extra
 bash-completion
 less
 nano
