@@ -1,2 +1,4 @@
 calamares
 calamares-settings-debian
+# нужен установщику для распаковки системы на диск (рекомендация calamares)
+squashfs-tools

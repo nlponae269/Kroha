@@ -1,5 +1,10 @@
 #!/bin/sh
 # Запуск установщика Calamares (обёртка над calamares-install-debian из Debian)
 pgrep -x calamares >/dev/null && exit 0
+# Если прошлая попытка установки оборвалась, Calamares оставляет диск
+# смонтированным — тогда он прячет «Установить рядом» и «Стереть диск».
+for m in $(findmnt -rn -o TARGET | grep '^/tmp/calamares-root' | sort -r); do
+	sudo umount -l "$m"
+done
 export QT_QPA_PLATFORMTHEME=gtk3
 exec /usr/bin/calamares-install-debian "$@"
