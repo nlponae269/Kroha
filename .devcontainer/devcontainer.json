@@ -1,0 +1,15 @@
+{
+  // Kroha OS в браузере: GitHub Codespaces запускает ISO в QEMU и показывает экран через noVNC.
+  // Ссылка на экран закрыта входом в твой GitHub (порт приватный).
+  "name": "Kroha OS — попробовать в браузере",
+  "image": "mcr.microsoft.com/devcontainers/base:debian",
+  "hostRequirements": { "cpus": 4, "memory": "8gb", "storage": "32gb" },
+  "features": { "ghcr.io/devcontainers/features/github-cli:1": {} },
+  "forwardPorts": [6080],
+  "portsAttributes": {
+    "6080": { "label": "Kroha OS", "onAutoForward": "openBrowser", "protocol": "http" }
+  },
+  "postCreateCommand": "sudo apt-get update -qq && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq qemu-system-x86 qemu-utils ovmf novnc websockify",
+  "postStartCommand": "bash scripts/codespace-run.sh",
+  "customizations": { "codespaces": { "openFiles": ["docs/codespace.md"] } }
+}
